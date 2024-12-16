@@ -1,6 +1,6 @@
 # Set the source and destination folders
-src_folder=./client/dist/
-dst_folder=../../live/chatNodeReact/
+src_folder=../client/dist/
+dst_folder=../../../live/chatNodeReact/
 
 #Check if the destination folder exists
 if [ ! -d "$dst_folder" ]; then

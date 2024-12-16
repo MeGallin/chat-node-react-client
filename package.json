@@ -5,13 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "env-cmd -f .env.dev vite",
-    "build": "env-cmd -f .env.prod tsc -b && vite build",
+    "build": "env-cmd -f .env.prod vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "bootstrap": "^5.3.3",
     "env-cmd": "^10.1.0",
     "react": "^18.3.1",
+    "react-bootstrap": "^2.10.7",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.0.2"
   },
