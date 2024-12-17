@@ -3,8 +3,8 @@ import { Alert, Button, Form, Row, Col, Stack } from 'react-bootstrap';
 import { AuthContext } from '../context/AuthContext';
 
 const Register = () => {
-  const { user } = useContext(AuthContext);
-  
+  const { registerInfo, updateRegisterInfo } = useContext(AuthContext);
+
   return (
     <>
       <Form>
@@ -18,14 +18,35 @@ const Register = () => {
           <Col xs="6">
             <Stack gap="3">
               <h2>Register </h2>
-              <Form.Control type="text" placeholder="name" />
-              <Form.Control type="email" placeholder="email" />
-              <Form.Control type="password" placeholder="password" />
+              <Form.Control
+                type="text"
+                placeholder="name"
+                onChange={(e) =>
+                  updateRegisterInfo({ ...registerInfo, name: e.target.value })
+                }
+              />
+              <Form.Control
+                type="email"
+                placeholder="email"
+                onChange={(e) =>
+                  updateRegisterInfo({ ...registerInfo, email: e.target.value })
+                }
+              />
+              <Form.Control
+                type="password"
+                placeholder="password"
+                onChange={(e) =>
+                  updateRegisterInfo({
+                    ...registerInfo,
+                    password: e.target.value,
+                  })
+                }
+              />
               <Button variant="primary" type="submit">
                 Register
               </Button>
               <Alert variant="danger">
-                <p>Error occured</p>
+                <p>Error occurred</p>
               </Alert>
             </Stack>
           </Col>
