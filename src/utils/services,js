@@ -1,7 +1,6 @@
 export const baseUrl = `${import.meta.env.VITE_API_END_POINT}`;
 
 export const postRequest = async (url, body) => {
-  console.log('body', body);
   const response = await fetch(baseUrl + url, {
     method: 'POST',
     headers: {
