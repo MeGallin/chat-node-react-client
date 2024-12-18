@@ -1,5 +1,5 @@
 import { createContext, useCallback, useEffect, useState } from 'react';
-import { postRequest } from '../utils/services,js';
+import { postRequest } from '../utils/services.js';
 
 export const AuthContext = createContext();
 
@@ -41,7 +41,7 @@ export const AuthContextProvider = ({ children }) => {
       setIsRegisterLoading(true);
       setRegisterError(null);
 
-      const response = await postRequest(`api/users/register`, registerInfo);
+      const response = await postRequest(`/api/users/register`, registerInfo);
       setIsRegisterLoading(false);
 
       if (response.error) {
@@ -61,7 +61,7 @@ export const AuthContextProvider = ({ children }) => {
       setIsLoginLoading(true);
       setLoginError(null);
 
-      const response = await postRequest(`api/users/login`, loginInfo);
+      const response = await postRequest(`/api/users/login`, loginInfo);
       setIsLoginLoading(false);
 
       if (response.error) {
