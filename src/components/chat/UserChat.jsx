@@ -5,7 +5,7 @@ import avatar from '../../assets/avatar.svg';
 
 const UserChat = ({ chat, user }) => {
   const { recipientUser, error } = useFetchRecipientUser(chat, user);
- 
+
   return (
     <Stack
       direction="horizontal"
