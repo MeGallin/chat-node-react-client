@@ -12,6 +12,8 @@ export const ChatContextProvider = ({ children, user }) => {
   const [messages, setMessages] = useState([]);
   const [isMessagesLoading, setIsMessagesLoading] = useState(false);
   const [messagesError, setMessagesError] = useState(null);
+  const [sendTextMessageError, setSendTextMessageError] = useState(null);
+  const [newMessage, setNewMessage] = useState({});
 
   useEffect(() => {
     const getUsers = async () => {
@@ -70,6 +72,25 @@ export const ChatContextProvider = ({ children, user }) => {
     getMessages();
   }, [currentChat]);
 
+  const sendTextMessage = useCallback(
+    async (textMessage, sender, currentChatId, setTextMessage) => {
+      if (!textMessage) return;
+      const res = await postRequest(`/api/messages/create-message`, {
+        text: textMessage,
+        senderId: sender._id,
+        chatId: currentChatId,
+      });
+
+      if (res.error) {
+        return setSendTextMessageError(res.message);
+      }
+      setNewMessage(res);
+      setMessages((prev) => [...prev, res]);
+      setTextMessage('');
+    },
+    [],
+  );
+
   const updateCurrentChat = useCallback((chat) => {
     setCurrentChat(chat);
   }, []);
@@ -98,6 +119,9 @@ export const ChatContextProvider = ({ children, user }) => {
         messages,
         isMessagesLoading,
         messagesError,
+        sendTextMessage,
+        sendTextMessageError,
+        newMessage,
       }}
     >
       {children}
