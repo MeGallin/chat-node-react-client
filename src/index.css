@@ -145,6 +145,7 @@ body {
 }
 
 .notifications-header {
+  color: white;
   padding: 1rem;
   padding-bottom: 0;
   display: flex;
@@ -171,6 +172,7 @@ body {
   flex-direction: column;
   cursor: pointer;
   padding: 0.5rem 1rem;
+  color: white;
 }
 
 .notification.not-read {
