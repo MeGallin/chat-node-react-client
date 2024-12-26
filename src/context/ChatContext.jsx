@@ -125,7 +125,8 @@ export const ChatContextProvider = ({ children, user }) => {
       }
     };
     getUserChats();
-  }, [user]);
+  }, [user, notifications]);
+
 
   // 7. Fetch messages for the current chat
   useEffect(() => {
@@ -219,6 +220,28 @@ export const ChatContextProvider = ({ children, user }) => {
     [],
   );
 
+  const markThisUserNotificationAsRead = useCallback(
+    (thisUserNotifications, notifications) => {
+      // Mark notification as read
+      const mNotifications = notifications.map((el) => {
+        let notification;
+        thisUserNotifications.forEach((n) => {
+          if (el.senderId === n.senderId) {
+            notification = {
+              ...n,
+              isRead: true,
+            };
+          } else {
+            notification = el;
+          }
+        });
+        return notification;
+      });
+      setNotifications(mNotifications);
+    },
+    [],
+  );
+
   return (
     <ChatContext.Provider
       value={{
@@ -240,6 +263,7 @@ export const ChatContextProvider = ({ children, user }) => {
         allUsers,
         markAllNotificationAsRead,
         markNotificationAsRead,
+        markThisUserNotificationAsRead,
       }}
     >
       {children}

@@ -15,8 +15,6 @@ const ChatBox = () => {
   const [textMessage, setTextMessage] = useState('');
   const scroll = useRef();
 
- 
-
   useEffect(() => {
     scroll.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
