@@ -22,7 +22,7 @@ export const ChatContextProvider = ({ children, user }) => {
 
   // 1. Initialize socket
   useEffect(() => {
-    const skt = io('http://localhost:3000');
+    const skt = io(`${import.meta.env.VITE_API_END_POINT}`);
     setSocket(skt);
 
     return () => {
@@ -126,7 +126,6 @@ export const ChatContextProvider = ({ children, user }) => {
     };
     getUserChats();
   }, [user, notifications]);
-
 
   // 7. Fetch messages for the current chat
   useEffect(() => {
