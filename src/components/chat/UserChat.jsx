@@ -43,15 +43,19 @@ const UserChat = ({ chat, user }) => {
         }
       }}
     >
-      <div className="d-flex">
+      <div className="d-flex ">
         <div className="me-2">
           <img src={avatar} alt="avatar" height="36px" />
+          <span className={isOnline ? 'user-online-chat' : ''}></span>
         </div>
         <div className="text-content">
           <div className="name">{recipientUser?.name}</div>
-          <div className="text">{latestMessage?.text &&
-           <span>{truncateText(latestMessage?.text)}</span>}
-           </div>
+
+          <div className="text">
+            {latestMessage?.text && (
+              <span>{truncateText(latestMessage?.text)}</span>
+            )}
+          </div>
         </div>
       </div>
       <div className="d-flex flex-column align-items-end">
@@ -63,7 +67,6 @@ const UserChat = ({ chat, user }) => {
         >
           {thisUserNotifications?.length > 0 && thisUserNotifications?.length}
         </div>
-        <span className={isOnline ? 'user-online' : null}></span>
       </div>
     </Stack>
   );
