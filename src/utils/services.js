@@ -35,3 +35,17 @@ export const getRequest = async (url) => {
 
   return data;
 };
+
+export const deleteRequest = async (url) => {
+  const response = await fetch(baseUrl + url, {
+    method: 'DELETE',
+  });
+  const data = await response.json();
+
+  if (!response.ok) {
+    let message = data || 'An unknown error occurred';
+    return { error: true, message };
+  }
+
+  return data;
+};

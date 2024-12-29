@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useCallback } from 'react';
-import { getRequest, postRequest } from '../utils/services';
+import { getRequest, postRequest, deleteRequest } from '../utils/services';
 import { io } from 'socket.io-client';
 
 export const ChatContext = createContext();
@@ -24,7 +24,6 @@ export const ChatContextProvider = ({ children, user }) => {
   useEffect(() => {
     const skt = io(`${import.meta.env.VITE_API_END_POINT}`);
     setSocket(skt);
-
     return () => {
       skt.disconnect();
     };
@@ -32,10 +31,9 @@ export const ChatContextProvider = ({ children, user }) => {
 
   // 2. Add user to online list + get online users
   useEffect(() => {
-    if (!socket) return;
-    if (!user?._id) return;
-
+    if (!socket || !user?._id) return;
     socket.emit('addNewUser', user._id);
+
     socket.on('getOnlineUsers', (users) => {
       setOnlineUsers(users);
     });
@@ -48,10 +46,9 @@ export const ChatContextProvider = ({ children, user }) => {
   // 3. Send message when newMessage updates
   useEffect(() => {
     if (!socket || !newMessage?.chatId) return;
-    const recipientId = currentChat?.members?.find((id) => id !== user?._id);
 
+    const recipientId = currentChat?.members?.find((id) => id !== user?._id);
     socket.emit('sendMessage', { ...newMessage, recipientId });
-    // No corresponding socket.on('sendMessage') to turn off, so we omit that
   }, [socket, newMessage, currentChat, user]);
 
   // 4. Receive messages & notifications
@@ -59,7 +56,6 @@ export const ChatContextProvider = ({ children, user }) => {
     if (!socket) return;
 
     socket.on('getMessage', (message) => {
-      // Only add the message if it's for the active chat
       if (message.chatId === currentChat?._id) {
         setMessages((prev) => [...prev, message]);
       }
@@ -90,20 +86,8 @@ export const ChatContextProvider = ({ children, user }) => {
   useEffect(() => {
     const getUsers = async () => {
       const res = await getRequest('/api/users');
-      if (res.error) {
-        // handle error if needed
-        return;
-      }
-      // Filter out self and anyone we already have a chat with
-      const pChats = res.filter((u) => {
-        if (u._id === user?._id) return false;
-
-        const isChatCreated = userChats?.some((chat) =>
-          chat.members.includes(u._id),
-        );
-        return !isChatCreated;
-      });
-      setPotentialChats(pChats);
+      if (res.error) return;
+      setPotentialChats(res);
       setAllUsers(res);
     };
     getUsers();
@@ -119,7 +103,7 @@ export const ChatContextProvider = ({ children, user }) => {
         const res = await getRequest(`/api/chats/${user._id}`);
         setUserChats(res);
       } catch (error) {
-        setUserChatsError(error); // or setUserChatsError({ error, res });
+        setUserChatsError(error);
       } finally {
         setIsUserChatsLoading(false);
       }
@@ -127,23 +111,25 @@ export const ChatContextProvider = ({ children, user }) => {
     getUserChats();
   }, [user, notifications]);
 
-  // 7. Fetch messages for the current chat
-  useEffect(() => {
-    const getMessages = async () => {
-      setIsMessagesLoading(true);
-      if (!currentChat?._id) return;
+  // **7. Extract the getMessages logic into a reusable function**
+  const fetchMessages = useCallback(async () => {
+    setIsMessagesLoading(true);
+    if (!currentChat?._id) return;
 
-      try {
-        const res = await getRequest(`/api/messages/${currentChat._id}`);
-        setMessages(res);
-      } catch (error) {
-        setMessagesError(error); // or setMessagesError({ error, res });
-      } finally {
-        setIsMessagesLoading(false);
-      }
-    };
-    getMessages();
+    try {
+      const res = await getRequest(`/api/messages/${currentChat._id}`);
+      setMessages(res);
+    } catch (error) {
+      setMessagesError(error);
+    } finally {
+      setIsMessagesLoading(false);
+    }
   }, [currentChat]);
+
+  // **Run fetchMessages in useEffect, so it also updates on chat change**
+  useEffect(() => {
+    fetchMessages();
+  }, [fetchMessages]);
 
   // 8. Sending a text message
   const sendTextMessage = useCallback(
@@ -159,11 +145,8 @@ export const ChatContextProvider = ({ children, user }) => {
       if (res.error) {
         return setSendTextMessageError(res.message);
       }
-      // Update newMessage (which triggers the effect to emit via socket)
       setNewMessage(res);
-      // Add to local state
       setMessages((prev) => [...prev, res]);
-      // Clear the local input
       setTextMessage('');
     },
     [],
@@ -184,6 +167,7 @@ export const ChatContextProvider = ({ children, user }) => {
     setUserChats((prev) => [...prev, res]);
   }, []);
 
+  // Notification Helpers
   const markAllNotificationAsRead = useCallback((notifications) => {
     const mNotifications = notifications.map((notification) => ({
       ...notification,
@@ -194,7 +178,7 @@ export const ChatContextProvider = ({ children, user }) => {
 
   const markNotificationAsRead = useCallback(
     (notification, userChats, user, notifications) => {
-      // Find the chat to open
+      // find the chat to open
       const desiredChat = userChats.find((chat) => {
         const chatMembers = [user?._id, notification.senderId];
         const isDesiredChat = chat?.members.every((member) =>
@@ -202,7 +186,8 @@ export const ChatContextProvider = ({ children, user }) => {
         );
         return isDesiredChat;
       });
-      //Mark notification as read
+
+      // mark notifications
       const mNotifications = notifications.map((el) => {
         if (el.senderId === notification.senderId) {
           return {
@@ -213,7 +198,7 @@ export const ChatContextProvider = ({ children, user }) => {
         return el;
       });
       setNotifications(mNotifications);
-      // Update currentChat
+
       updateCurrentChat(desiredChat);
     },
     [],
@@ -221,7 +206,6 @@ export const ChatContextProvider = ({ children, user }) => {
 
   const markThisUserNotificationAsRead = useCallback(
     (thisUserNotifications, notifications) => {
-      // Mark notification as read
       const mNotifications = notifications.map((el) => {
         let notification;
         thisUserNotifications.forEach((n) => {
@@ -240,6 +224,18 @@ export const ChatContextProvider = ({ children, user }) => {
     },
     [],
   );
+
+  // **Delete a message and refresh local messages**
+  const deleteMessage = async (messageId) => {
+    const response = await deleteRequest(`/api/messages/${messageId}`);
+    if (response.error) {
+      // handle error or set some error state
+      // setError(response.message);
+      return;
+    }
+    // After successful delete, re-fetch messages for current chat
+    fetchMessages();
+  };
 
   return (
     <ChatContext.Provider
@@ -263,6 +259,7 @@ export const ChatContextProvider = ({ children, user }) => {
         markAllNotificationAsRead,
         markNotificationAsRead,
         markThisUserNotificationAsRead,
+        deleteMessage,
       }}
     >
       {children}
