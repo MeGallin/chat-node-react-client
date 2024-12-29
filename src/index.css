@@ -81,7 +81,6 @@ body {
   max-height: calc(100vh - 10rem);
   overflow-y: auto;
   background: rgb(25, 25, 25);
-  border-radius: 10px;
 }
 
 .messages-box {
@@ -108,7 +107,6 @@ body {
 .message {
   background: #282828;
   padding: 0.75rem;
-  border-radius: 5px;
   max-width: 50%;
 }
 

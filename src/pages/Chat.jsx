@@ -14,7 +14,7 @@ const Chat = () => {
     useContext(ChatContext);
 
   return (
-    <Container fluid className="py-3">
+    <Container fluid className="py-3 bg-dark p-2 bg-opacity-10 border border-2 ">
       <PotentialChats />
 
       {userChats?.length < 1 ? null : (
@@ -25,7 +25,7 @@ const Chat = () => {
             className="border-end mb-3 mb-md-0 d-flex flex-column"
           >
             {/* This inner div grows to fill the available vertical space */}
-            <div className="flex-grow-1 overflow-auto">
+            <div className="flex-grow-1 overflow-auto bg-dark border border-2">
               {isUserChatsLoading && <p>Loading...</p>}
 
               {!isUserChatsLoading &&
@@ -43,7 +43,7 @@ const Chat = () => {
 
           {/* Example second column for ChatBox, also grows to fill height */}
           <Col xs={12} md={8} className="d-flex flex-column">
-            <div className="flex-grow-1 overflow-auto">
+            <div className="flex-grow-1 overflow-auto border border-2">
               {/* Your ChatBox or other content */}
               <ChatBox />
             </div>
