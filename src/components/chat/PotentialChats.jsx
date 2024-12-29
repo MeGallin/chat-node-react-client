@@ -6,10 +6,14 @@ const PotentialChats = () => {
   const { user } = useContext(AuthContext);
   const { potentialChats, createChat, onlineUsers } = useContext(ChatContext);
 
+  const potentialFriends = potentialChats.filter(
+    (friend) => friend?._id !== user?._id,
+  );
+
   return (
     <div className="all-users">
-      {potentialChats &&
-        potentialChats?.map((u) => (
+      {potentialFriends &&
+        potentialFriends?.map((u) => (
           <div
             className="single-user"
             key={u?._id}

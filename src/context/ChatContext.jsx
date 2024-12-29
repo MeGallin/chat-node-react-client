@@ -87,6 +87,7 @@ export const ChatContextProvider = ({ children, user }) => {
     const getUsers = async () => {
       const res = await getRequest('/api/users');
       if (res.error) return;
+
       setPotentialChats(res);
       setAllUsers(res);
     };

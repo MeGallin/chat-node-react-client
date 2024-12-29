@@ -14,22 +14,24 @@ const NavBar = () => {
             Chat App
           </Link>
         </h2>
-
         {user && (
-          <span className="text-warning">Logged in as {user?.name}</span>
+          <span className="text-warning ">
+            You are logged in as {user?.name}
+            <span className={user?.name ? 'user-online-nav' : null}></span>
+          </span>
         )}
         <Nav>
           <Stack direction="horizontal" gap="3">
             {user && (
               <>
-              <Notification/>
-              <Link
-                to="/login"
-                className="link-light text-decoration-none"
-                onClick={logoutUser}
-              >
-                Logout
-              </Link>
+                <Notification />
+                <Link
+                  to="/login"
+                  className="link-light text-decoration-none"
+                  onClick={logoutUser}
+                >
+                  Logout
+                </Link>
               </>
             )}
 
@@ -45,10 +47,8 @@ const NavBar = () => {
                   Register
                 </Link>
               </>
-             
             )}
           </Stack>
-          
         </Nav>
       </Container>
     </Navbar>

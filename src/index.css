@@ -42,7 +42,15 @@ body {
   font-size: 14px;
   color: rgb(180, 180, 180);
 }
-
+.user-online-nav {
+  border: green 1px solid;
+  display: inline-block;
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  background: rgb(0, 219, 0);
+  position: absolute;
+}
 .user-online {
   border: green 1px solid;
   display: inline-block;
