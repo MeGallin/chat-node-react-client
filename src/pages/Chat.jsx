@@ -14,23 +14,21 @@ const Chat = () => {
     useContext(ChatContext);
 
   return (
-    <Container
-      fluid
-      className="py-3 bg-dark p-2 bg-opacity-10 border border-2 "
-    >
+    <Container fluid className="bg-dark bg-opacity-10">
       <PotentialChats />
 
       {userChats?.length < 1 ? null : (
-        <Row className="vh-100">
+        <Row>
           <Col
             xs={12}
             md={4}
             className="border-end mb-3 mb-md-0 d-flex flex-column"
           >
-            {/* This inner div grows to fill the available vertical space */}
             <div className="flex-grow-1 overflow-auto bg-dark border border-2">
               {isUserChatsLoading && <p>Loading...</p>}
-
+              <div className="chat-header">
+                <div className="chat-header-text">OPEN CHATS </div>
+              </div>
               {!isUserChatsLoading &&
                 userChats?.map((chat) => (
                   <div

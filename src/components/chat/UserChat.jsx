@@ -32,43 +32,50 @@ const UserChat = ({ chat, user }) => {
   };
 
   return (
-    <Stack
-      direction="horizontal"
-      gap={3}
-      className="user-card align-items-center p-2 "
-      role="button"
-      onClick={() => {
-        if (thisUserNotifications?.length !== 0) {
-          markThisUserNotificationAsRead(thisUserNotifications, notifications);
-        }
-      }}
-    >
-      <div className="d-flex ">
-        <div className="me-2">
-          <img src={avatar} alt="avatar" height="36px" />
-          <span className={isOnline ? 'user-online-chat' : ''}></span>
-        </div>
-        <div className="text-content">
-          <div className="name">{recipientUser?.name}</div>
+    <>
+      <Stack
+        direction="horizontal"
+        gap={3}
+        className="user-card align-items-center p-2 "
+        role="button"
+        onClick={() => {
+          if (thisUserNotifications?.length !== 0) {
+            markThisUserNotificationAsRead(
+              thisUserNotifications,
+              notifications,
+            );
+          }
+        }}
+      >
+        <div className="d-flex ">
+          <div className="me-2">
+            <img src={avatar} alt="avatar" height="36px" />
+            <span className={isOnline ? 'user-online-chat' : ''}></span>
+          </div>
+          <div className="text-content">
+            <div className="name">{recipientUser?.name}</div>
 
-          <div className="text">
-            {latestMessage?.text && (
-              <span>{truncateText(latestMessage?.text)}</span>
-            )}
+            <div className="text">
+              {latestMessage?.text && (
+                <span>{truncateText(latestMessage?.text)}</span>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-      <div className="d-flex flex-column align-items-end">
-        <div className="date">{moment(latestMessage?.createdAt).fromNow()}</div>
-        <div
-          className={
-            thisUserNotifications?.length > 0 ? 'notification-count' : ''
-          }
-        >
-          {thisUserNotifications?.length > 0 && thisUserNotifications?.length}
+        <div className="d-flex flex-column align-items-end">
+          <div className="date">
+            {moment(latestMessage?.createdAt).fromNow()}
+          </div>
+          <div
+            className={
+              thisUserNotifications?.length > 0 ? 'notification-count' : ''
+            }
+          >
+            {thisUserNotifications?.length > 0 && thisUserNotifications?.length}
+          </div>
         </div>
-      </div>
-    </Stack>
+      </Stack>
+    </>
   );
 };
 

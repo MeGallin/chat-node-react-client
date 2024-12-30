@@ -54,7 +54,7 @@ const ChatBox = () => {
 
   return (
     <Stack gap={4} className="chat-box">
-      <div className="chat-header" style={{ color: 'white' }}>
+      <div className="chat-header">
         <strong>{recipientUser?.name}</strong>
       </div>
 
@@ -105,6 +105,7 @@ const ChatBox = () => {
           onEnter={handleSendMessage} // <--- Sending on Enter
           fontFamily="Nunito"
           borderColor="rgba(72, 112, 223, 0.3)"
+          borderRadius="4px"
         />
         <button className="send-btn" type="submit" onClick={handleSendMessage}>
           <svg
