@@ -7,18 +7,22 @@ body {
 }
 /* All users */
 .all-users {
-  display: flex;
-  margin-bottom: 1rem;
+  overflow-x: auto; /* Enables horizontal scrolling */
+  overflow-y: hidden; /* Hides vertical overflow if any */
+  white-space: nowrap; /* Ensures items stay on one line */
+  border: 1px solid #ccc; /* Optional styling for clarity */
 }
 
 .single-user {
   background: rgb(0, 213, 255);
-
+  background-color: lightgrey;
   cursor: pointer;
-  padding: 5px 7px;
-  border-radius: 10px;
+  padding: 2px 5px;
+  border-radius: 6px;
   margin-right: 0.5rem;
-  position: relative;
+  text-transform: uppercase;
+  font-size: 0.8em;
+  font-weight: bold;
 }
 
 /* User Card */
@@ -58,9 +62,9 @@ body {
   width: 12px;
   border-radius: 50%;
   background: rgb(0, 219, 0);
-  position: absolute;
-  top: -3px;
-  right: -3px;
+  position: relative;
+  top: -6px;
+  right: -10px;
   z-index: 2;
 }
 .user-online-chat {

@@ -11,7 +11,7 @@ const PotentialChats = () => {
   );
 
   return (
-    <div className="all-users">
+    <div className="all-users py-1 bg-dark d-flex justify-content-between">
       {potentialFriends &&
         potentialFriends?.map((u) => (
           <div

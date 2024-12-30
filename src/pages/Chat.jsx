@@ -14,7 +14,10 @@ const Chat = () => {
     useContext(ChatContext);
 
   return (
-    <Container fluid className="py-3 bg-dark p-2 bg-opacity-10 border border-2 ">
+    <Container
+      fluid
+      className="py-3 bg-dark p-2 bg-opacity-10 border border-2 "
+    >
       <PotentialChats />
 
       {userChats?.length < 1 ? null : (

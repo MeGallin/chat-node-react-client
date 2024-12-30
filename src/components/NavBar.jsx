@@ -7,7 +7,7 @@ import Notification from './chat/Notification';
 const NavBar = () => {
   const { user, logoutUser } = useContext(AuthContext);
   return (
-    <Navbar bg="dark" className="mb-4" style={{ height: '3.75rem' }}>
+    <Navbar bg="dark" className="sticky-top mb-1" style={{ height: '3.75rem' }}>
       <Container>
         <h2>
           <Link to="/" className="link-light text-decoration-none">
@@ -15,10 +15,12 @@ const NavBar = () => {
           </Link>
         </h2>
         {user && (
-          <span className="text-warning ">
-            You are logged in as {user?.name}
-            <span className={user?.name ? 'user-online-nav' : null}></span>
-          </span>
+          <div className="text-warning ">
+            <div className="display-6">
+              {user?.name}
+              <span className={user?.name ? 'user-online-nav' : null}></span>
+            </div>
+          </div>
         )}
         <Nav>
           <Stack direction="horizontal" gap="3">
