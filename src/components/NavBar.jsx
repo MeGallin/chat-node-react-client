@@ -11,7 +11,7 @@ const NavBar = () => {
       <Container>
         <h2>
           <Link to="/" className="link-light text-decoration-none">
-            Chat App
+            Chat
           </Link>
         </h2>
         {user && (
