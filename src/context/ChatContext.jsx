@@ -46,7 +46,6 @@ export const ChatContextProvider = ({ children, user }) => {
   // 3. Send message when newMessage updates
   useEffect(() => {
     if (!socket || !newMessage?.chatId) return;
-
     const recipientId = currentChat?.members?.find((id) => id !== user?._id);
     socket.emit('sendMessage', { ...newMessage, recipientId });
   }, [socket, newMessage, currentChat, user]);
@@ -131,6 +130,21 @@ export const ChatContextProvider = ({ children, user }) => {
   useEffect(() => {
     fetchMessages();
   }, [fetchMessages]);
+
+  // Listen for deleted messages
+  useEffect(() => {
+    if (!socket) return;
+    socket.on('messageDeleted', ({ messageId }) => {
+      console.log('Deleting message on frontend for messageId:', messageId);
+      // Remove the message from the local state
+      setMessages((prev) =>
+        prev.filter((message) => message._id !== messageId),
+      );
+    });
+    return () => {
+      socket.off('messageDeleted');
+    };
+  }, [socket]);
 
   // 8. Sending a text message
   const sendTextMessage = useCallback(
@@ -226,15 +240,28 @@ export const ChatContextProvider = ({ children, user }) => {
     [],
   );
 
-  // **Delete a message and refresh local messages**
   const deleteMessage = async (messageId) => {
-    const response = await deleteRequest(`/api/messages/${messageId}`);
-    if (response.error) {
-      // handle error or set some error state
-      // setError(response.message);
+    if (!socket || !currentChat?._id || !user?._id) {
+      console.error('Invalid socket, currentChat, or user:', {
+        socket,
+        currentChat,
+        user,
+      });
       return;
     }
-    // After successful delete, re-fetch messages for current chat
+
+    socket.emit('deleteMessage', {
+      messageId,
+      senderId: user._id,
+      chatId: { _id: currentChat._id, members: currentChat.members },
+    });
+
+    const response = await deleteRequest(`/api/messages/${messageId}`);
+    if (response.error) {
+      console.error('Error deleting message:', response.message);
+      return;
+    }
+
     fetchMessages();
   };
 

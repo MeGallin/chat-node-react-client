@@ -50,12 +50,13 @@ const ChatBox = () => {
 
   const handleDelete = (messageId) => {
     deleteMessage(messageId);
+    handleSendMessage();
   };
 
   return (
     <Stack gap={4} className="chat-box">
       <div className="chat-header">
-        <strong>{recipientUser?.name}</strong>
+        <div className="chat-header-text">{recipientUser?.name}</div>
       </div>
 
       <Stack gap={3} className="messages ">
@@ -81,7 +82,7 @@ const ChatBox = () => {
               </div>
             ) : null}
             <Stack
-              key={message?._id} // Ensure this key is unique
+              key={message?._id}
               className={`message ${
                 message?.senderId === user?._id
                   ? 'message self align-self-end flex-grow-0'
