@@ -254,3 +254,10 @@ body {
 .border-temp {
   border: 4px solid yellow;
 }
+.typing-indicator {
+  position: relative;
+  top: 0;
+  font-size: 0.8em;
+  color: orange;
+  margin-left: 2rem;
+}

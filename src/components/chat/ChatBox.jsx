@@ -15,21 +15,45 @@ const ChatBox = () => {
     isMessagesLoading,
     sendTextMessage,
     deleteMessage,
+    startTyping,
+    stopTyping,
+    typingUsers,
   } = useContext(ChatContext);
   const { recipientUser } = useFetchRecipientUser(currentChat, user);
 
   const [textMessage, setTextMessage] = useState('');
   const scroll = useRef();
+  const typingTimeoutRef = useRef();
 
   useEffect(() => {
     scroll.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Emit typing events based on user actions
+  const handleTyping = () => {
+    if (!currentChat?._id) return;
+
+    startTyping(currentChat._id);
+
+    // Clear the previous timeout if the user keeps typing
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+    // Stop typing after a delay of inactivity (e.g., 1 second)
+    typingTimeoutRef.current = setTimeout(() => {
+      stopTyping(currentChat._id);
+    }, 1000);
+  };
+
   // Helper function to send a message
   const handleSendMessage = () => {
-    // Prevent sending empty messages if you want
     if (!textMessage.trim()) return;
     sendTextMessage(textMessage, user, currentChat?._id, setTextMessage);
+    stopTyping(currentChat?._id); // Stop typing once the message is sent
+  };
+
+  const handleDelete = (messageId) => {
+    deleteMessage(messageId);
+    handleSendMessage();
   };
 
   if (!recipientUser) {
@@ -48,23 +72,15 @@ const ChatBox = () => {
     );
   }
 
-  const handleDelete = (messageId) => {
-    deleteMessage(messageId);
-    handleSendMessage();
-  };
-
   return (
     <Stack gap={4} className="chat-box">
       <div className="chat-header">
         <div className="chat-header-text">{recipientUser?.name}</div>
       </div>
-
-      <Stack gap={3} className="messages ">
+      <Stack gap={3} className="messages">
         {messages?.map((message) => (
           <React.Fragment key={message?._id}>
-            {' '}
-            {/* Add key here */}
-            {message?.senderId === user?._id ? (
+            {message?.senderId === user?._id && (
               <div
                 className="delete-icon self align-self-end flex-grow-0"
                 onClick={() => handleDelete(message?._id)}
@@ -80,13 +96,12 @@ const ChatBox = () => {
                   <path d="M11.46.146A.5.5 0 0 0 11.107 0H4.893a.5.5 0 0 0-.353.146L.146 4.54A.5.5 0 0 0 0 4.893v6.214a.5.5 0 0 0 .146.353l4.394 4.394a.5.5 0 0 0 .353.146h6.214a.5.5 0 0 0 .353-.146l4.394-4.394a.5.5 0 0 0 .146-.353V4.893a.5.5 0 0 0-.146-.353zm-6.106 4.5L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 1 1 .708-.708" />
                 </svg>
               </div>
-            ) : null}
+            )}
             <Stack
-              key={message?._id}
               className={`message ${
                 message?.senderId === user?._id
                   ? 'message self align-self-end flex-grow-0'
-                  : 'message align-self-start flex-grow-0 '
+                  : 'message align-self-start flex-grow-0'
               }`}
               ref={scroll}
             >
@@ -99,11 +114,25 @@ const ChatBox = () => {
         ))}
       </Stack>
 
+      <Stack>
+        {/* Typing Indicator */}
+        {typingUsers.some(
+          (typingUser) =>
+            typingUser.chatId === currentChat?._id &&
+            typingUser.senderId !== user?._id,
+        ) && (
+          <spam className="typing-indicator">
+            {recipientUser?.name} is typing...
+          </spam>
+        )}
+      </Stack>
+
       <Stack direction="horizontal" gap={3} className="chat-input text-grow-0">
         <InputEmoji
           value={textMessage}
           onChange={setTextMessage}
-          onEnter={handleSendMessage} // <--- Sending on Enter
+          onEnter={handleSendMessage}
+          onKeyDown={handleTyping}
           fontFamily="Nunito"
           borderColor="rgba(72, 112, 223, 0.3)"
           borderRadius="4px"

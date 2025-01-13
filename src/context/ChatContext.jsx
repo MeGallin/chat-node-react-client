@@ -19,6 +19,7 @@ export const ChatContextProvider = ({ children, user }) => {
   const [sendTextMessageError, setSendTextMessageError] = useState(null);
   const [newMessage, setNewMessage] = useState({});
   const [allUsers, setAllUsers] = useState([]);
+  const [typingUsers, setTypingUsers] = useState([]);
 
   // 1. Initialize socket
   useEffect(() => {
@@ -265,6 +266,69 @@ export const ChatContextProvider = ({ children, user }) => {
     fetchMessages();
   };
 
+  useEffect(() => {
+    if (!socket || !currentChat?._id) return;
+    socket.emit('joinChat', currentChat._id);
+  }, [socket, currentChat]);
+
+  //Typing feature
+  useEffect(() => {
+    if (!socket) {
+      console.log('Socket not initialized.');
+      return;
+    }
+
+    socket.on('connect', () => {
+      console.log('Socket connected:', socket.id);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Socket disconnected.');
+    });
+
+    socket.on('userTyping', ({ chatId, senderId, isTyping }) => {
+      setTypingUsers((prev) => {
+        const otherTypingUsers = prev.filter(
+          (user) => user.senderId !== senderId,
+        );
+        return isTyping
+          ? [...otherTypingUsers, { chatId, senderId }]
+          : otherTypingUsers;
+      });
+    });
+
+    return () => {
+      console.log('Cleaning up socket listeners.');
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('userTyping');
+    };
+  }, [socket]);
+
+  const startTyping = (chatId) => {
+    if (!socket || !chatId || !user?._id) {
+      console.error('Invalid socket, chatId, or user:', {
+        socket,
+        chatId,
+        user,
+      });
+      return;
+    }
+    socket.emit('startTyping', { chatId, senderId: user._id });
+  };
+
+  const stopTyping = (chatId) => {
+    if (!socket || !chatId || !user?._id) {
+      console.error('Invalid socket, chatId, or user:', {
+        socket,
+        chatId,
+        user,
+      });
+      return;
+    }
+    socket.emit('stopTyping', { chatId, senderId: user._id });
+  };
+
   return (
     <ChatContext.Provider
       value={{
@@ -288,6 +352,9 @@ export const ChatContextProvider = ({ children, user }) => {
         markNotificationAsRead,
         markThisUserNotificationAsRead,
         deleteMessage,
+        startTyping,
+        stopTyping,
+        typingUsers,
       }}
     >
       {children}
