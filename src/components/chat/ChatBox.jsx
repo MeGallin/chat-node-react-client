@@ -41,7 +41,7 @@ const ChatBox = () => {
     // Stop typing after a delay of inactivity (e.g., 1 second)
     typingTimeoutRef.current = setTimeout(() => {
       stopTyping(currentChat._id);
-    }, 1000);
+    }, 500);
   };
 
   // Helper function to send a message
