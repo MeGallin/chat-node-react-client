@@ -172,16 +172,31 @@ export const ChatContextProvider = ({ children, user }) => {
     setCurrentChat(chat);
   }, []);
 
-  const createChat = useCallback(async (firstUserId, secondUserId) => {
-    const res = await postRequest('/api/chats/create-chat', {
-      firstUserId,
-      secondUserId,
-    });
-    if (res.error) {
-      return console.log(res.message);
-    }
-    setUserChats((prev) => [...prev, res]);
-  }, []);
+  const createChat = useCallback(
+    async (firstUserId, secondUserId) => {
+      // Check if the chat already exists
+      const existingChat = userChats?.find(
+        (chat) =>
+          chat.members.includes(firstUserId) &&
+          chat.members.includes(secondUserId),
+      );
+      if (existingChat) {
+        console.log('Chat already exists:', existingChat);
+        return;
+      }
+      const res = await postRequest('/api/chats/create-chat', {
+        firstUserId,
+        secondUserId,
+      });
+
+      if (res.error) {
+        return console.log(res.message);
+      }
+
+      setUserChats((prev) => [...prev, res]);
+    },
+    [userChats],
+  );
 
   // Notification Helpers
   const markAllNotificationAsRead = useCallback((notifications) => {
