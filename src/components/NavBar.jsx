@@ -15,8 +15,8 @@ const NavBar = () => {
           </Link>
         </h2>
         {user && (
-          <div className="text-warning ">
-            <div className="display-6">
+          <div className="text-success ">
+            <div className="fs-5">
               {user?.name}
               <span className={user?.name ? 'user-online-nav' : null}></span>
             </div>
