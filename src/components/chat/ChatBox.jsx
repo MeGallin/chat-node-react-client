@@ -121,9 +121,9 @@ const ChatBox = () => {
             typingUser.chatId === currentChat?._id &&
             typingUser.senderId !== user?._id,
         ) && (
-          <spam className="typing-indicator">
+          <span className="typing-indicator">
             {recipientUser?.name} is typing...
-          </spam>
+          </span>
         )}
       </Stack>
 
