@@ -266,24 +266,43 @@ export const ChatContextProvider = ({ children, user }) => {
       return;
     }
 
+    // Emit the deleteMessage event with the correct chatId
     socket.emit('deleteMessage', {
       messageId,
-      senderId: user._id,
-      chatId: { _id: currentChat._id, members: currentChat.members },
+      chatId: currentChat._id, // Use the chat's _id directly
     });
 
+    // Make the API call to delete the message from the database
     const response = await deleteRequest(`/api/messages/${messageId}`);
     if (response.error) {
       console.error('Error deleting message:', response.message);
       return;
     }
 
-    fetchMessages();
+    // Update the local messages state for the sender
+    setMessages((prev) => prev.filter((message) => message._id !== messageId));
   };
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('messageDeleted', ({ messageId }) => {
+      setMessages((prev) =>
+        prev.filter((message) => message._id !== messageId),
+      );
+    });
+
+    return () => {
+      socket.off('messageDeleted');
+    };
+  }, [socket]);
 
   useEffect(() => {
     if (!socket || !currentChat?._id) return;
     socket.emit('joinChat', currentChat._id);
+    return () => {
+      socket.emit('leaveChat', currentChat._id); // Optional: Leave room on chat change
+    };
   }, [socket, currentChat]);
 
   //Typing feature
