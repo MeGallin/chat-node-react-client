@@ -279,9 +279,7 @@ export const ChatContextProvider = ({ children, user }) => {
       return;
     }
 
-    // Update the local messages state for the sender
-    setMessages((prev) => prev.filter((message) => message._id !== messageId));
-    // fetchMessages(); // Re-fetch messages for the current chat
+    fetchMessages(); // Re-fetch messages for the current chat
   };
 
   useEffect(() => {
